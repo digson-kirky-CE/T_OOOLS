@@ -6,3 +6,8 @@ clang++ -o print print.cpp
 cd ..
 cd print-k
 clang++ -o print-w print.cpp
+cd ..
+cd len
+g++ -std=c++11 -O2 -o len len.cpp
+mv len ~/../usr/bin
+cd ..
