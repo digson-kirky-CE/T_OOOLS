@@ -1,59 +1,50 @@
 #include <iostream>
-#include <vector>
 #include <string>
 #include <cstring>
-#include <map>
-#include <sstream>
+#include <vector>
 
-// 通用len函数
-template<typename T>
-size_t len(const T& container) {
-    return container.size();
-}
+// ============ Python风格的len()函数 ============
 
-// C字符串特化
+// 1. C字符串特化（必须先声明，避免模板匹配）
 size_t len(const char* s) {
-    return strlen(s);
+    return std::strlen(s);
 }
 
-// 解析字符串为列表（支持逗号分隔）
-std::vector<std::string> parse_list(const std::string& s) {
-    std::vector<std::string> result;
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, ',')) {
-        // 去除首尾空格
-        item.erase(0, item.find_first_not_of(" \t"));
-        item.erase(item.find_last_not_of(" \t") + 1);
-        if (!item.empty()) result.push_back(item);
-    }
-    return result;
+// 2. 字符串特化
+size_t len(const std::string& s) {
+    return s.length();
 }
+
+// 3. STL容器（vector, list, map等）
+template<typename Container>
+auto len(const Container& c) -> decltype(c.size()) {
+    return c.size();
+}
+
+// 4. 静态数组（编译期确定大小）
+template<typename T, size_t N>
+constexpr size_t len(const T (&)[N]) {
+    return N;
+}
+
+// ============ 主程序 ============
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "用法: len <参数>" << std::endl;
-        std::cerr << "  len hello           # 5 (字符串长度)" << std::endl;
-        std::cerr << "  len [1,2,3,4,5]    # 5 (列表长度)" << std::endl;
-        std::cerr << "  len a b c          # 3 (多个参数)" << std::endl;
+        std::cerr << "用法: len <字符串或参数列表>" << std::endl;
+        std::cerr << "示例:" << std::endl;
+        std::cerr << "  len hello        # 输出: 5" << std::endl;
+        std::cerr << "  len \"Hello World\"  # 输出: 11" << std::endl;
+        std::cerr << "  len a b c d e    # 输出: 5 (参数个数)" << std::endl;
         return 1;
     }
 
-    std::string arg = argv[1];
-    
-    // 检测是否为列表格式 [1,2,3]
-    if (arg.front() == '[' && arg.back() == ']') {
-        std::string content = arg.substr(1, arg.length() - 2);
-        auto list = parse_list(content);
-        std::cout << len(list) << std::endl;
-    } 
-    // 如果是多个参数
-    else if (argc > 2) {
-        std::cout << (argc - 1) << std::endl;
-    } 
-    // 单个参数作为字符串
-    else {
+    // 如果只有1个参数，返回字符串长度
+    if (argc == 2) {
         std::cout << len(argv[1]) << std::endl;
+    } else {
+        // 多个参数，返回参数个数（不包括命令本身）
+        std::cout << (argc - 1) << std::endl;
     }
     
     return 0;
