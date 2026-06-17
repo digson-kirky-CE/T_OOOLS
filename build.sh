@@ -9,5 +9,5 @@ clang++ -o print-w print.cpp
 cd ..
 cd len
 g++ -std=c++11 -O2 -o len len.cpp
-mv len ~/../usr/bin
+cp -r len ~/../usr/bin
 cd ..
